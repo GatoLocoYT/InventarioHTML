@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control De Inventario</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffe0;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header input {
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .header button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .product-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .product-card,
+        .product-edit-form {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-card {
+            background-color: #f9f9f9;
+        }
+
+        .product-quantity {
+            font-size: 2rem;
+            font-weight: bold;
+            color: blue;
+            margin-right: 1rem;
+        }
+
+        .product-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .product-code {
+            color: #555;
+        }
+
+        .edit-button,
+        .delete-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #555;
+        }
+
+        .edit-button:hover,
+        .delete-button:hover {
+            color: #000;
+        }
+
+        .product-edit-form {
+            flex-wrap: wrap;
+        }
+
+        .product-edit-form input {
+            margin-right: 0.5rem;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-edit-form button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-edit-form button:first-of-type {
+            background-color: #28a745;
+            color: white;
+            margin-right: 0.5rem;
+        }
+
+        .product-edit-form button:last-of-type {
+            background-color: #dc3545;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <!-- React and ReactDOM -->
+    <script src="https://unpkg.com/react/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom/umd/react-dom.development.js" crossorigin></script>
+
+    <!-- Babel -->
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const initialProducts = [
+            { name: "7up", quantity: 7, code: "7799876543210" },
+            { name: "Aquarius", quantity: 7, code: "7790123456789" },
+            { name: "Bonaqua", quantity: 13, code: "7793456789123" },
+            { name: "Bubly", quantity: 17, code: "7793457890123" },
+            { name: "Canada Dry", quantity: 4, code: "7792345678912" },
+            { name: "Cola Cola", quantity: 92, code: "7791234567890" },
+            { name: "Fanta", quantity: 5, code: "7793219876540" },
+            { name: "Mirinda", quantity: 6, code: "7797894561230" },
+            { name: "Pepsi Cola", quantity: 3, code: "7799876543210" },
+            { name: "Sprite", quantity: 4, code: "7796543219870" },
+            { name: "Schweppes", quantity: 8, code: "7798765432109" },
+            { name: "Mountain Dew", quantity: 12, code: "7790987654321" },
+            { name: "Dr Pepper", quantity: 10, code: "7792345678901" },
+            { name: "Gatorade", quantity: 20, code: "7793456789012" },
+            { name: "Lipton", quantity: 15, code: "7794567890123" },
+            { name: "Nestea", quantity: 18, code: "7795678901234" },
+            { name: "Powerade", quantity: 25, code: "7796789012345" },
+            { name: "Red Bull", quantity: 30, code: "7797890123456" },
+            { name: "Monster", quantity: 14, code: "7798901234567" },
+            { name: "Rockstar", quantity: 22, code: "7799012345678" },
+            { name: "Coca Cola Zero", quantity: 5, code: "7791234567891" },
+            { name: "Coca Cola Light", quantity: 9, code: "7792345678902" },
+            { name: "Pepsi Light", quantity: 11, code: "7793456789013" },
+            { name: "Pepsi Zero", quantity: 6, code: "7794567890124" },
+            { name: "Fanta Zero", quantity: 7, code: "7795678901235" },
+            { name: "Sprite Zero", quantity: 8, code: "7796789012346" },
+            { name: "Manaos", quantity: 12, code: "7797890123457" },
+            { name: "Crush", quantity: 10, code: "7798901234568" },
+            { name: "Inca Kola", quantity: 3, code: "7799012345679" },
+            { name: "Jupiña", quantity: 2, code: "7790123456780" }
+        ];
+
+        function ProductList({ products, updateProduct, deleteProduct }) {
+            const [editingCode, setEditingCode] = useState(null);
+            const [editedName, setEditedName] = useState('');
+            const [editedCode, setEditedCode] = useState('');
+            const [editedQuantity, setEditedQuantity] = useState(0);
+
+            const startEditing = (product) => {
+                setEditingCode(product.code);
+                setEditedName(product.name);
+                setEditedCode(product.code);
+                setEditedQuantity(product.quantity);
+            };
+
+            const handleUpdate = () => {
+                if (editedName.trim() === '' || editedCode.trim() === '') {
+                    alert('El nombre y el código EAN no pueden estar vacíos.');
+                    return;
+                }
+
+                if (editedQuantity <= 0) {
+                    alert('La cantidad debe ser mayor que 0.');
+                    return;
+                }
+
+                updateProduct({
+                    name: editedName,
+                    code: editedCode,
+                    quantity: editedQuantity,
+                });
+
+                setEditingCode(null);
+            };
+
+            return (
+                <div className="product-list">
+                    {products.sort((a, b) => a.name.localeCompare(b.name)).map((product) =>
+                        editingCode === product.code ? (
+                            <div key={product.code} className="product-edit-form">
+                                <input
+                                    placeholder="Nombre del Producto"
+                                    type="text"
+                                    value={editedName}
+                                    onChange={(e) => setEditedName(e.target.value)}
+                                />
+                                <input
+                                    placeholder="Código EAN"
+                                    type="text"
+                                    value={editedCode}
+                                    onChange={(e) => setEditedCode(e.target.value)}
+                                />
+                                <input
+                                    placeholder="Cantidad"
+                                    type="number"
+                                    value={editedQuantity}
+                                    onChange={(e) => setEditedQuantity(Number(e.target.value))}
+                                />
+                                <button onClick={handleUpdate}>Aceptar</button>
+                                <button onClick={() => setEditingCode(null)}>Cancelar</button>
+                            </div>
+                        ) : (
+                            <div key={product.code} className="product-card">
+                                <div className="product-quantity">{product.quantity}</div>
+                                <div>
+                                    <div className="product-name">{product.name}</div>
+                                    <div className="product-code">{product.code}</div>
+                                </div>
+                                <button className="edit-button" onClick={() => startEditing(product)}>
+                                    ✏️
+                                </button>
+                                <button className="delete-button" onClick={() => deleteProduct(product.code)}>
+                                    🗑️
+                                </button>
+                            </div>
+                        )
+                    )}
+                </div>
+            );
+        }
+
+        function App() {
+            const [products, setProducts] = useState(initialProducts);
+            const [newProductName, setNewProductName] = useState('');
+            const [newProductCode, setNewProductCode] = useState('');
+
+            const addProduct = () => {
+                if (newProductName.trim() === '' || newProductCode.trim() === '') {
+                    alert('El nombre y el código EAN no pueden estar vacíos.');
+                    return;
+                }
+
+                const existingProduct = products.find(
+                    (product) => product.code === newProductCode
+                );
+
+                if (existingProduct) {
+                    setProducts((prevProducts) =>
+                        prevProducts.map((product) =>
+                            product.code === newProductCode
+                                ? { ...product, quantity: product.quantity + 1 }
+                                : product
+                        )
+                    );
+                } else {
+                    setProducts([
+                        ...products,
+                        { name: newProductName, code: newProductCode, quantity: 1 },
+                    ]);
+                }
+
+                setNewProductName('');
+                setNewProductCode('');
+            };
+
+            const updateProduct = (updatedProduct) => {
+                setProducts((prevProducts) =>
+                    prevProducts.map((product) =>
+                        product.code === updatedProduct.code ? updatedProduct : product
+                    )
+                );
+            };
+
+            const deleteProduct = (code) => {
+                setProducts((prevProducts) =>
+                    prevProducts.filter((product) => product.code !== code)
+                );
+            };
+
+            return (
+                <div className="container">
+                    <h1>Control De Inventario</h1>
+                    <div className="header">
+                        <input
+                            type="text"
+                            id="productName"
+                            placeholder="Nombre del producto"
+                            value={newProductName}
+                            onChange={(e) => setNewProductName(e.target.value)}
+                        />
+                        <input
+                            type="text"
+                            id="productCode"
+                            placeholder="Código EAN"
+                            value={newProductCode}
+                            onChange={(e) => setNewProductCode(e.target.value)}
+                        />
+                        <button id="addProductButton" onClick={addProduct}>+</button>
+                    </div>
+                    <ProductList
+                        products={products}
+                        updateProduct={updateProduct}
+                        deleteProduct={deleteProduct}
+                    />
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+
+</html>
